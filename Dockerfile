@@ -10,8 +10,8 @@ RUN mvn dependency:go-offline -B
 # Copy source code
 COPY src ./src
 
-# Build the application
-RUN mvn clean package -DskipTests -B
+# Build the application and verify JAR exists
+RUN mvn clean package -DskipTests -B && ls -la target/
 
 # Runtime stage
 FROM eclipse-temurin:21-jre-alpine
