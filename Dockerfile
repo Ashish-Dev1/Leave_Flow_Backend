@@ -22,7 +22,7 @@ RUN addgroup -S spring && adduser -S spring -G spring
 WORKDIR /app
 
 # Copy JAR from build stage
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/leavemanage-0.0.1-SNAPSHOT.jar app.jar
 
 # Change ownership to non-root user
 RUN chown -R spring:spring /app
