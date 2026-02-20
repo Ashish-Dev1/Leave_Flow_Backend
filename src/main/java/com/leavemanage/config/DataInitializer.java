@@ -23,15 +23,20 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        if (userRepository.findByRole(Role.MANAGER).isEmpty()) {
+        if (userRepository.findAllByRole(Role.MANAGER).isEmpty()) {
 
-            User manager = new User();
-            manager.setName("Admin Manager");
-            manager.setEmail("princedev2112@gmail.com");
-            manager.setPassword(encoder.encode("admin123"));
-            manager.setRole(Role.MANAGER);
-
-            userRepository.save(manager);
+            User manager1 = new User();
+            manager1.setName("Admin ");
+            manager1.setEmail("nandan@netpy.in");
+            manager1.setPassword(encoder.encode("Nandan@123"));
+            manager1.setRole(Role.MANAGER);
+            User manager2 = new User();
+            manager2.setName("HR Manager");
+            manager2.setEmail("hr@netpy.in");
+            manager2.setPassword(encoder.encode("Hr@12345"));
+            manager2.setRole(Role.MANAGER);
+            userRepository.save(manager1);
+            userRepository.save(manager2);
         }
     }
 }

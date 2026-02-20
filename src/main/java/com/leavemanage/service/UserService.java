@@ -41,8 +41,10 @@ public class UserService {
 
         LeaveRequest saved = leaveRepository.save(leave);
 
-        User manager = userRepository.findByRole(Role.MANAGER)
-                .orElseThrow(() -> new RuntimeException("Manager not found"));
+        List<User> managers = userRepository.findAllByRole(Role.MANAGER);
+        if (managers.isEmpty()) {
+            throw new RuntimeException("Manager not found");
+        }
 
         String portalUrl="https://leave.netpy.in/admin/dashboard";
         String subject =
@@ -51,7 +53,7 @@ public class UserService {
                         " to " + saved.getEndDate() + ")";
 
         String body =
-                "Dear " + manager.getName() + ",\n\n" +
+                "Dear Manager,\n\n" +
                         "A new leave request has been submitted.\n\n" +
                         "Employee Details:\n" +
                         "-------------------------\n" +
@@ -65,15 +67,17 @@ public class UserService {
                         portalUrl+"\n\n"+
                         "Regards,\nNetPy Technologies";
 
-        try {
-            emailService.sendEmail(
-                    manager.getEmail(),
-                    subject,
-                    body,
-                    user.getEmail()
-            );
-        } catch (Exception e) {
-            System.out.println("Email sending failed: " + e.getMessage());
+        for (User manager : managers) {
+            try {
+                emailService.sendEmail(
+                        manager.getEmail(),
+                        subject,
+                        body,
+                        user.getEmail()
+                );
+            } catch (Exception e) {
+                System.out.println("Email sending failed for " + manager.getEmail() + ": " + e.getMessage());
+            }
         }
 
         return saved;

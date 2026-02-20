@@ -7,6 +7,7 @@ import com.leavemanage.dto.RegisterResponse;
 import com.leavemanage.service.AuthService;
 import com.leavemanage.util.CustomUserDetailsService;
 import com.leavemanage.util.JwtUtil;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,7 +29,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+    public ResponseEntity<?> login(@Valid  @RequestBody AuthRequest request) {
         try {
             AuthResponse response = authService.login(request);
             return ResponseEntity.ok(response);
@@ -39,7 +40,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
         try {
             authService.register(request);
             return ResponseEntity.ok(new RegisterResponse("User registered successfully"));
