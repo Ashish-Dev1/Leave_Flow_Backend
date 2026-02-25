@@ -1,5 +1,6 @@
 package com.leavemanage.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -12,27 +13,26 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
-    @Bean
-    public OpenAPI customOpenAPI() {
-        final String securitySchemeName = "bearerAuth";
+    private static final String SECURITY_SCHEME_NAME = "bearerAuth";
 
+    @Bean
+    public OpenAPI leaveManagementOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
                         .title("Leave Management System API")
-                        .description("API documentation for Leave Management System - Manage leave requests, users, and approvals")
-                        .version("1.0.0")
+                        .description("Complete API documentation for frontend integration")
+                        .version("1.0")
                         .contact(new Contact()
                                 .name("Leave Management Team")
                                 .email("support@leavemanage.com"))
                         .license(new License()
                                 .name("Apache 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0")))
-                .addSecurityItem(new SecurityRequirement()
-                        .addList(securitySchemeName))
-                .components(new io.swagger.v3.oas.models.Components()
-                        .addSecuritySchemes(securitySchemeName,
+                .addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME_NAME))
+                .components(new Components()
+                        .addSecuritySchemes(SECURITY_SCHEME_NAME,
                                 new SecurityScheme()
-                                        .name(securitySchemeName)
+                                        .name(SECURITY_SCHEME_NAME)
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")));
