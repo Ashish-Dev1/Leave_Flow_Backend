@@ -34,6 +34,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(name = "password_changed_at")
+    private java.time.LocalDateTime passwordChangedAt;
+
     // getters & setters
 }
 

@@ -41,8 +41,10 @@ public class SecurityConfig {
                         .requestMatchers("/", "/error").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/webjars/**").permitAll()
                         .requestMatchers("/api/manager/**").hasRole("MANAGER")
                         .requestMatchers("/api/leaves/**").hasRole("USER")
+                        .requestMatchers("/api/v1/user/**").hasAnyRole("USER", "MANAGER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(

@@ -190,6 +190,39 @@ public class UserService {
                 .toList();
     }
 
+    /**
+     * Flexible filter for user leaves by month, year, and status.
+     * Handles all combinations: only month, only year, both, neither, with/without status.
+     * Uses repository method with JPQL for database-level filtering.
+     */
+    public List<LeaveDto> getUserLeavesByMonthYearAndStatus(Long userId, Integer month, Integer year, String status) {
+        LeaveStatus leaveStatus = null;
+        if (status != null && !status.isEmpty()) {
+            leaveStatus = LeaveStatus.valueOf(status.toUpperCase());
+        }
+
+        // If no filters, return all user leaves
+        if (month == null && year == null && leaveStatus == null) {
+            return getMyLeaves(userId);
+        }
+
+        // Use repository method with database-level filtering
+        return leaveRepository.findByUserAndMonthYearAndStatus(userId, month, year, leaveStatus)
+                .stream()
+                .map(leave -> new LeaveDto(
+                        leave.getId(),
+                        leave.getStartDate(),
+                        leave.getEndDate(),
+                        leave.getReason(),
+                        leave.getLeaveType(),
+                        leave.getStatus(),
+                        leave.getManagerComment(),
+                        leave.getUser().getId(),
+                        leave.getUser().getName()
+                ))
+                .toList();
+    }
+
     public List<LeaveDto> getUserLeavesByStatus(Long userId, String status) {
         LeaveStatus leaveStatus = LeaveStatus.valueOf(status.toUpperCase());
         return leaveRepository.findByUserId(userId)
@@ -212,21 +245,27 @@ public class UserService {
     public List<UserDto> getUsersWithLeaveFilters(Integer month, Integer year, String status) {
         List<User> users = userRepository.findAllByRole(Role.USER);
 
+        // Parse status if provided
+        final LeaveStatus leaveStatus;
+        if (status != null && !status.isEmpty()) {
+            leaveStatus = LeaveStatus.valueOf(status.toUpperCase());
+        } else {
+            leaveStatus = null;
+        }
+
+        // Create final copies for lambda capture
+        final Integer finalMonth = month;
+        final Integer finalYear = year;
+
         return users.stream()
                 .map(user -> {
-                    // Get user's leaves based on filters
-                    List<LeaveRequest> userLeaves;
-                    if (month != null && year != null) {
-                        userLeaves = leaveRepository.findByUserAndMonth(user.getId(), year, month);
-                    } else if (status != null && !status.isEmpty()) {
-                        LeaveStatus leaveStatus = LeaveStatus.valueOf(status.toUpperCase());
-                        userLeaves = leaveRepository.findByUserId(user.getId())
-                                .stream()
-                                .filter(leave -> leave.getStatus() == leaveStatus)
-                                .toList();
-                    } else {
-                        userLeaves = leaveRepository.findByUserId(user.getId());
-                    }
+                    // Get user's leaves with flexible filters
+                    List<LeaveRequest> userLeaves = leaveRepository.findByUserId(user.getId())
+                            .stream()
+                            .filter(leave -> finalMonth == null || leave.getStartDate().getMonthValue() == finalMonth)
+                            .filter(leave -> finalYear == null || leave.getStartDate().getYear() == finalYear)
+                            .filter(leave -> leaveStatus == null || leave.getStatus() == leaveStatus)
+                            .toList();
 
                     return new UserDto(
                             user.getId(),

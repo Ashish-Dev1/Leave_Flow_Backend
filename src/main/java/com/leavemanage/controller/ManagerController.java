@@ -45,47 +45,43 @@ public class ManagerController {
         return leaveRepository.findAll();
     }
 
-    @GetMapping("/leaves/filter")
-    public List<LeaveRequest> filterLeaves(
-            @RequestParam(required = false) Integer month,
-            @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) LeaveStatus status
-    ) {
-        if (month != null && year != null) {
-            if (status != null) {
-                return leaveRepository.findByMonthAndStatus(year, month, status);
-            } else {
-                return leaveRepository.findByMonth(year, month);
-            }
-        } else if (status != null) {
-            return leaveRepository.findByStatus(status);
-        } else {
-            return leaveRepository.findAll();
-        }
-    }
+//    @GetMapping("/leaves/filter")
+//    public List<LeaveRequest> filterLeaves(
+//            // Time-based filters
+//            @RequestParam(required = false) Integer month,
+//            @RequestParam(required = false) Integer year,
+//            @RequestParam(required = false) LeaveStatus status
+//    ) {
+//        return leaveRepository.findByMonthYearAndStatus(month, year, status);
+//    }
 
     @GetMapping("/leaves/enhanced-filter")
     public List<LeaveRequest> filterLeavesEnhanced(
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year,
             @RequestParam(required = false) String userName,
             @RequestParam(required = false) String leaveType,
             @RequestParam(required = false) LeaveStatus status,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+
     ) {
-        return leaveRepository.findWithFilters(userName, leaveType, status, startDate, endDate);
+        // Single unified query handles ALL combinations
+        String statusStr = status != null ? status.name() : null;
+        return leaveRepository.findByAllFilters(month, year, userName, leaveType, statusStr, startDate, endDate);
     }
 
-    @GetMapping("/users/{userId}/leaves/enhanced-filter")
-    public List<LeaveRequest> filterUserLeavesEnhanced(
-            @PathVariable Long userId,
-            @RequestParam(required = false) String userName,
-            @RequestParam(required = false) String leaveType,
-            @RequestParam(required = false) LeaveStatus status,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
-    ) {
-        return leaveRepository.findByUserWithFilters(userId, userName, leaveType, status, startDate, endDate);
-    }
+//    @GetMapping("/users/{userId}/leaves/enhanced-filter")
+//    public List<LeaveRequest> filterUserLeavesEnhanced(
+//            @PathVariable Long userId,
+//            @RequestParam(required = false) String userName,
+//            @RequestParam(required = false) String leaveType,
+//            @RequestParam(required = false) LeaveStatus status,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+//            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+//    ) {
+//        return leaveRepository.findByUserWithFilters(userId, userName, leaveType, status, startDate, endDate);
+//    }
 
     @GetMapping("/users/enhanced-filter")
     public List<UserDto> filterUsersEnhanced(
@@ -164,10 +160,11 @@ public class ManagerController {
     @GetMapping("/users/{userId}/leaves/filter")
     public List<LeaveDto> getUserLeavesByMonth(
             @PathVariable Long userId,
-            @RequestParam Integer month,
-            @RequestParam Integer year
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) String status
     ) {
-        return userService.getUserLeavesByMonth(userId, month, year);
+        return userService.getUserLeavesByMonthYearAndStatus(userId, month, year, status);
     }
 
     @GetMapping("/users/{userId}/leaves/status")

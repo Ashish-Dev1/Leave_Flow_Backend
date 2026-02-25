@@ -42,6 +42,11 @@ public class JwtUtil {
         return extractClaims(token).getSubject();
     }
 
+    // EXTRACT ISSUED AT (for password change invalidation)
+    public Date extractIssuedAt(String token) {
+        return extractClaims(token).getIssuedAt();
+    }
+
     // VALIDATE TOKEN
     public boolean isTokenValid(String token, UserDetails userDetails) {
         return extractUsername(token).equals(userDetails.getUsername())
