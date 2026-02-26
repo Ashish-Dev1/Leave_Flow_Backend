@@ -3,6 +3,7 @@ package com.leavemanage.dto;
 
 
 import com.leavemanage.model.LeaveStatus;
+import com.leavemanage.model.SessionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -18,7 +19,7 @@ public class LeaveDto {
     private String leaveType;
     private LeaveStatus status;
     private String managerComment;
-
+    private SessionType leaveSession;
     private Long userId;
     private String userName;
 

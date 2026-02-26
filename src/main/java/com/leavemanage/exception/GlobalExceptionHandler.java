@@ -27,7 +27,9 @@ public class GlobalExceptionHandler {
             IncorrectPasswordException.class,
             PasswordsMismatchException.class,
             SamePasswordException.class,
-            PasswordValidationException.class
+            PasswordValidationException.class,
+            HalfDayLeaveValidationException.class,
+            HalfDaySessionRequiredException.class
     })
     public ResponseEntity<RegisterResponse> handleBadRequestExceptions(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

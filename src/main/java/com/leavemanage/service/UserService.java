@@ -2,10 +2,9 @@ package com.leavemanage.service;
 
 import com.leavemanage.dto.LeaveDto;
 import com.leavemanage.dto.UserDto;
-import com.leavemanage.model.LeaveRequest;
-import com.leavemanage.model.LeaveStatus;
-import com.leavemanage.model.Role;
-import com.leavemanage.model.User;
+import com.leavemanage.exception.HalfDayLeaveValidationException;
+import com.leavemanage.exception.HalfDaySessionRequiredException;
+import com.leavemanage.model.*;
 import com.leavemanage.repository.LeaveRepository;
 import com.leavemanage.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -38,6 +37,26 @@ public class UserService {
 
         leave.setUser(user);
         leave.setStatus(LeaveStatus.PENDING);
+        if (leave.getLeaveType().equals("half-day") &&
+                !leave.getStartDate().equals(leave.getEndDate())) {
+
+            throw new HalfDayLeaveValidationException("Half day leave must be single day");
+        }
+        if (leave.getLeaveType().equals("half-day")) {
+
+            if (leave.getLeaveSession() == null) {
+                throw new HalfDaySessionRequiredException("Session is required for HALF_DAY leave");
+            }
+
+        }
+
+        // Rule 2: session must be NULL if NOT HALF_DAY
+        if (!leave.getLeaveType().equals("half-day")) {
+
+            leave.setLeaveSession(null);
+
+        }
+
 
         LeaveRequest saved = leaveRepository.save(leave);
 
@@ -167,6 +186,7 @@ public class UserService {
                         leave.getLeaveType(),
                         leave.getStatus(),
                         leave.getManagerComment(),
+                        leave.getLeaveSession(),
                         leave.getUser().getId(),
                         leave.getUser().getName()
                 ))
@@ -177,16 +197,17 @@ public class UserService {
         return leaveRepository.findByUserAndMonth(userId, year, month)
                 .stream()
                 .map(leave -> new LeaveDto(
-                        leave.getId(),
-                        leave.getStartDate(),
-                        leave.getEndDate(),
-                        leave.getReason(),
-                        leave.getLeaveType(),
-                        leave.getStatus(),
-                        leave.getManagerComment(),
+                                        leave.getId(),
+                                        leave.getStartDate(),
+                                        leave.getEndDate(),
+                                        leave.getReason(),
+                                        leave.getLeaveType(),
+                                        leave.getStatus(),
+                                        leave.getManagerComment(),
+                        leave.getLeaveSession(),
                         leave.getUser().getId(),
-                        leave.getUser().getName()
-                ))
+                                        leave.getUser().getName()
+                                ))
                 .toList();
     }
 
@@ -217,6 +238,7 @@ public class UserService {
                         leave.getLeaveType(),
                         leave.getStatus(),
                         leave.getManagerComment(),
+                        leave.getLeaveSession(),
                         leave.getUser().getId(),
                         leave.getUser().getName()
                 ))
@@ -236,6 +258,7 @@ public class UserService {
                         leave.getLeaveType(),
                         leave.getStatus(),
                         leave.getManagerComment(),
+                        leave.getLeaveSession(),
                         leave.getUser().getId(),
                         leave.getUser().getName()
                 ))

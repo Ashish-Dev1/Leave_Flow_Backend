@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.EnumSet;
 
 @Entity
 @Table(name = "leave_requests")
@@ -24,6 +25,7 @@ public class LeaveRequest {
     private String reason;
     
     @Column(name = "leave_type")
+    //@Enumerated(EnumType.STRING)
     private String leaveType;
 
     @Enumerated(EnumType.STRING)
@@ -35,6 +37,6 @@ public class LeaveRequest {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    // getters & setters
+    @Enumerated(EnumType.STRING)
+    private SessionType leaveSession;
 }
