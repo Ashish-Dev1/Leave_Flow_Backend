@@ -16,9 +16,15 @@ public class ChangePasswordRequestDTO {
 
     @NotBlank(message = "New password is required")
     @Pattern(
-            regexp = "^(?=.*[^A-Za-z0-9]).{8,}$",
-            message = "New password must be at least 8 characters long and contain at least one special character"
+            regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9]).{8,}$",
+            message ="Password must meet the following requirements:\n"
+            + "- At least 8 characters long\n"
+            + "- At least one uppercase letter\n"
+            + "- At least one lowercase letter\n"
+            + "- At least one number\n"
+            + "- At least one special character"
     )
+    
     private String newPassword;
 
     @NotBlank(message = "Confirm password is required")
