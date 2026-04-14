@@ -27,12 +27,12 @@ public class DataInitializer implements CommandLineRunner {
 
             User manager1 = new User();
             manager1.setName("Admin ");
-            manager1.setEmail("admin@gmail.com");
+            manager1.setEmail("inceprince92@gmail.com");
             manager1.setPassword(encoder.encode("Admin@123"));
             manager1.setRole(Role.MANAGER);
             User manager2 = new User();
             manager2.setName("HR Manager");
-            manager2.setEmail("hr@gmail.com");
+            manager2.setEmail("kafleashish53@gmail.com");
             manager2.setPassword(encoder.encode("Hr@12345"));
             manager2.setRole(Role.MANAGER);
             userRepository.save(manager1);
